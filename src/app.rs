@@ -16,12 +16,7 @@ pub async fn serve() {
         .route("/static/*path", get(serve_static_file))
         .route("/", get(handle_index))
         .route("/contacts", get(handle_contacts))
-        .route("/servo1", post(handle_servo1))
-        .route("/servo2", post(handle_servo2))
-        .route("/servo3", post(handle_servo3))
-        .route("/servo4", post(handle_servo4))
-        .route("/servo5", post(handle_servo5))
-        .route("/servo6", post(handle_servo6));
+        .route("/servo", post(handle_servo));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();

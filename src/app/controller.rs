@@ -50,110 +50,21 @@ pub async fn handle_contacts() -> Html<String> {
     ])))
 }
 
-pub async fn handle_servo1(Json(payload): Json<Servo>) -> Json<AjaxResult> {
+pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     pyo3::prepare_freethreaded_python();
     
     let angle = payload.angle.parse::<f64>().unwrap();
+    let servo = payload.servo.parse::<f64>().unwrap();
     let code = include_str!("test.py");
 
     Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[angle]);
+        let args = PyTuple::new_bound(py, &[servo, angle]);
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("test").unwrap().into();
         py_fun.call1(py, args).unwrap();
     });
 
     Json(AjaxResult {
         status: "ok".to_string(),
-        response: payload.angle
-    })
-}
-
-pub async fn handle_servo2(Json(payload): Json<Servo>) -> Json<AjaxResult> {
-    pyo3::prepare_freethreaded_python();
-    
-    let angle = payload.angle.parse::<f64>().unwrap();
-    let code = include_str!("test.py");
-
-    Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[angle]);
-        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("test").unwrap().into();
-        py_fun.call1(py, args).unwrap();
-    });
-
-    Json(AjaxResult {
-        status: "ok".to_string(),
-        response: payload.angle
-    })
-}
-
-pub async fn handle_servo3(Json(payload): Json<Servo>) -> Json<AjaxResult> {
-    pyo3::prepare_freethreaded_python();
-    
-    let angle = payload.angle.parse::<f64>().unwrap();
-    let code = include_str!("test.py");
-
-    Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[angle]);
-        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("test").unwrap().into();
-        py_fun.call1(py, args).unwrap();
-    });
-
-    Json(AjaxResult {
-        status: "ok".to_string(),
-        response: payload.angle
-    })
-}
-
-pub async fn handle_servo4(Json(payload): Json<Servo>) -> Json<AjaxResult> {
-    pyo3::prepare_freethreaded_python();
-    
-    let angle = payload.angle.parse::<f64>().unwrap();
-    let code = include_str!("test.py");
-
-    Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[angle]);
-        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("test").unwrap().into();
-        py_fun.call1(py, args).unwrap();
-    });
-
-    Json(AjaxResult {
-        status: "ok".to_string(),
-        response: payload.angle
-    })
-}
-
-pub async fn handle_servo5(Json(payload): Json<Servo>) -> Json<AjaxResult> {
-    pyo3::prepare_freethreaded_python();
-    
-    let angle = payload.angle.parse::<f64>().unwrap();
-    let code = include_str!("test.py");
-
-    Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[angle]);
-        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("test").unwrap().into();
-        py_fun.call1(py, args).unwrap();
-    });
-
-    Json(AjaxResult {
-        status: "ok".to_string(),
-        response: payload.angle
-    })
-}
-
-pub async fn handle_servo6(Json(payload): Json<Servo>) -> Json<AjaxResult> {
-    pyo3::prepare_freethreaded_python();
-    
-    let angle = payload.angle.parse::<f64>().unwrap();
-    let code = include_str!("test.py");
-
-    Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[angle]);
-        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("test").unwrap().into();
-        py_fun.call1(py, args).unwrap();
-    });
-
-    Json(AjaxResult {
-        status: "ok".to_string(),
-        response: payload.angle
+        response: format!("Servo {}, angle: {}", servo, angle)
     })
 }

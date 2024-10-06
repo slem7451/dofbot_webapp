@@ -47,12 +47,12 @@
                 if (val && isFinite(val) && val >= self.servoMin && val <= self.servoMax) {
                     $.ajax({
                         method: 'POST',
-                        url: '/' + name,
-                        data: JSON.stringify({angle: val}),
+                        url: '/servo',
+                        data: JSON.stringify({angle: val, servo: name.replace('servo', '')}),
                         contentType: 'application/json',
                         success: function(res) {
                             if (res.status == 'ok') {
-                                self.showResult(name, 'Угол: ' + res.response, true);
+                                self.showResult(name, res.response, true);
                             }
                         },
                         error: function(res) {
