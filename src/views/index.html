@@ -1,0 +1,87 @@
+
+<style>
+    .servo {
+        margin-block: 10px;
+    }
+    .result-text {
+        margin-left: 10px;
+        font-size: 1rem;
+    }
+    .danger {
+        color: red;
+    }
+    .success {
+        color: green;
+    }
+</style>
+<div id="servos"></div>
+<script>
+    var servoForms = {
+        servoCount: 6,
+        servoMax: 180,
+        servoMin: -180,
+        init: function() {
+            var self = this;
+
+            for (var i = 0; i < this.servoCount; i++) {
+                var label = 'Servo ' + (i + 1);
+                var name = 'servo' + (i + 1);
+
+                var html = '<div class="' + name + ' servo">';
+                html += '<label class="form-label">' + label + '</label>';
+                html += '<input type="number" max="180" min="-180" class="form-input" name="' + name + '"/>';
+                html += '<button type="button" class="form-btn servo-btn" data-input="' + name + '">Отправить</button>';
+                html += '<span class="result-text" data-servo="' + name + '"></span>'
+                html += '</div>';
+
+                $('#servos').append(html);
+            }
+
+            $(document).on('click', '.servo-btn', function() {
+                var name = $(this).attr('data-input');
+                var input = $('input[name=' + name + ']');
+                var val = input.val();
+
+                self.clearResult(name);
+                
+                if (val && isFinite(val) && val >= self.servoMin && val <= self.servoMax) {
+                    $.ajax({
+                        method: 'POST',
+                        url: '/' + name,
+                        data: JSON.stringify({angle: val}),
+                        contentType: 'application/json',
+                        success: function(res) {
+                            if (res.status == 'ok') {
+                                self.showResult(name, 'Угол: ' + res.response, true);
+                            }
+                        },
+                        error: function(res) {
+                            console.log(res.responseText);
+                        }
+                    });
+                } else {
+                    self.showResult(name, 'Неверное число. Число должно быть в дипаозоне [' + self.servoMin + '; ' + self.servoMax + ']', false);
+                }
+            });
+        },
+        showResult: function(name, text, isSuccess) {
+            var resultSpan = $('.result-text[data-servo=' + name + ']');
+            resultSpan.html(text);
+
+            if (!isSuccess) {
+                resultSpan.addClass('danger');
+            } else {
+                resultSpan.addClass('success');
+            }
+        },
+        clearResult: function(name) {
+            var resultSpan = $('.result-text[data-servo=' + name + ']');
+            resultSpan.html('');
+            resultSpan.removeClass('danger');
+            resultSpan.removeClass('success');
+        }
+    }
+    $(document).ready(function() {
+        servoForms.init();
+    });
+</script>

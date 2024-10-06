@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<style>
+    html {
+        font-family: monospace;
+    }
+    .header67h6uu4ie324w33r734 {
+        background: darkgray;
+        height: 30px;
+        padding: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 1001;
+    }
+    .header67h6uu4ie324w33r734 > .header-span {
+        font-size: 24px;
+    }
+    .header67h6uu4ie324w33r734 > .header-csu {
+        float: right;
+        font-size: 24px;
+    }
+    .footer67h6uu4ie324w33r734 {
+        background: mistyrose;
+        padding: 5px 10px;
+    }
+    .footer67h6uu4ie324w33r734 > .footer-rust {
+        float: right;
+    }
+    .content67h6uu4ie324w33r734 {
+        height: calc(100vh - 50px - 25px);
+        box-sizing: border-box;
+        background: ghostwhite;
+        padding: 10px;
+    }
+    .nav67h6uu4ie324w33r734 {
+        display: inline;
+        margin-left: 30px;
+    }
+    .nav67h6uu4ie324w33r734 a {
+        color: black;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+    .nav67h6uu4ie324w33r734 a:hover {
+        color: rgb(255, 243, 243);
+    }
+    body {
+        margin: 0;
+    }
+    .form-input {
+        height: 27px;
+        width: 10%;
+        border: 1px solid darkgray;
+        border-radius: .25rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        font-size: 1rem;
+        margin-right: 10px;
+    }
+    .form-input:focus-visible {
+        border: 1px solid #86b7fe;
+        box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+        outline: none;
+    }
+    .form-btn {
+        height: 31px;
+        background-color: #6c757d;
+        border-color: #6c757d;
+        text-align: center;
+        text-decoration: none;
+        vertical-align: middle;
+        border: 1px solid transparent;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        cursor: pointer;
+        color: white;
+        border-radius: .25rem;
+        font-size: 1rem;
+        top: -2px;
+        position: relative;
+    }
+    .form-btn:focus {
+        background-color: #5c636a;
+        border-color: #565e64;
+        box-shadow: 0 0 0 .25rem rgba(130, 138, 145, .5);
+    }
+    .form-btn:active {
+        background-color: #565e64;
+        border-color: #51585e;
+    }
+    .form-btn:hover {
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
+    .form-label {
+        font-weight: bold;
+        font-size: 1rem;
+        margin-right: 1%;
+    }
+</style>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{title}}</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <link rel="icon" href="/static/favicon.ico"/>
+        <script src="/static/scripts/jquery-3.7.1.min.js"></script>
+    </head>
+    <header class="header67h6uu4ie324w33r734">
+        <span class="header-span"><b>Dofbot</b> WebApp</span>
+        <div class="nav67h6uu4ie324w33r734">
+            <a href="/">Настройка позиции</a>
+            <a href="/contacts">Контакты</a>
+        </div>
+        <span class="header-csu">CSU</span>
+    </header>
+    <body>
+        <div class="content67h6uu4ie324w33r734">
+            {{content}}
+        </div>
+    </body>
+    <footer class="footer67h6uu4ie324w33r734">
+        <span class="footer-credits">Created by <b>Mikhail Kuznetsov</b></span>
+        <span class="footer-rust">Works on <i>Rust+Axum</i></span>
+    </footer>
+</html>

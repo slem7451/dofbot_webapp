@@ -1,0 +1,12 @@
+[package]
+name = "dofbot_webservice"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = "0.7.7"
+pyo3 = "0.22.3"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
