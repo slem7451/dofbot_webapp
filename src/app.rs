@@ -18,7 +18,7 @@ pub async fn serve() {
         .route("/contacts", get(handle_contacts))
         .route("/servo", post(handle_servo));
 
-    let listener = tokio::net::TcpListener::bind("localhost:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("192.168.1.11:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
