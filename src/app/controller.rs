@@ -56,7 +56,7 @@ pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     let code = include_str!("control.py");
 
     Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[payload.servo, payload.angle]);
+        let args = PyTuple::new_bound(py, &[&payload.servo, &payload.angle]);
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control").unwrap().into();
         py_fun.call1(py, args).unwrap();
     });
