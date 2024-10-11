@@ -53,16 +53,18 @@ pub async fn handle_contacts() -> Html<String> {
 pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     pyo3::prepare_freethreaded_python();
     
+    let angle = payload.angle.parse::<i32>().unwrap();
+    let servo = payload.servo.parse::<i32>().unwrap();
     let code = include_str!("control.py");
 
     Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[&payload.servo, &payload.angle]);
+        let args = PyTuple::new_bound(py, &[servo, angle]);
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control").unwrap().into();
         py_fun.call1(py, args).unwrap();
     });
 
     Json(AjaxResult {
         status: "ok".to_string(),
-        response: format!("Servo {}, angle: {} success", payload.servo, payload.angle)
+        response: format!("Servo {}, angle: {} success", servo, angle)
     })
 }
