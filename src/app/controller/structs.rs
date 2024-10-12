@@ -6,6 +6,16 @@ pub struct Servo {
     pub servo: String,
 }
 
+#[derive(Deserialize)]
+pub struct Pose {
+    pub pose: String,
+}
+
+#[derive(Deserialize)]
+pub struct State {
+    pub state: String,
+}
+
 #[derive(Serialize)]
 pub struct AjaxResult {
     pub status: String,

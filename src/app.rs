@@ -12,13 +12,18 @@ use tokio::fs;
 
 #[tokio::main]
 pub async fn serve() {
+    env_logger::init();
+    
     let app = Router::new()
         .route("/static/*path", get(serve_static_file))
         .route("/", get(handle_index))
         .route("/contacts", get(handle_contacts))
-        .route("/servo", post(handle_servo));
+        .route("/servo", post(handle_servo))
+        .route("/pose", post(handle_pose))
+        .route("/state", post(handle_state));
 
-    let listener = tokio::net::TcpListener::bind("192.168.1.11:3000").await.unwrap();
+    //let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();   //Запуск сервера локально
+    let listener = tokio::net::TcpListener::bind("192.168.1.11:3000").await.unwrap(); //Запуск сервера на роботе
     axum::serve(listener, app).await.unwrap();
 }
 

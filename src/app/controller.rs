@@ -55,7 +55,7 @@ pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     
     let angle = payload.angle.parse::<i32>().unwrap();
     let servo = payload.servo.parse::<i32>().unwrap();
-    let code = include_str!("control.py");
+    let code = include_str!("py/control.py");
 
     Python::with_gil(|py| {
         let args = PyTuple::new_bound(py, &[servo, angle]);
@@ -66,5 +66,43 @@ pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     Json(AjaxResult {
         status: "ok".to_string(),
         response: format!("Servo {}, angle: {} success", servo, angle)
+    })
+}
+
+pub async fn handle_pose(Json(payload): Json<Pose>) -> Json<AjaxResult> {
+    pyo3::prepare_freethreaded_python();
+    
+    let pose = payload.pose.parse::<i32>().unwrap();
+    let code = include_str!("py/control_pose.py");
+
+    Python::with_gil(|py| {
+        let args = PyTuple::new_bound(py, &[pose]);
+        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control_pose").unwrap().into();
+        py_fun.call1(py, args).unwrap();
+    });
+
+    Json(AjaxResult {
+        status: "ok".to_string(),
+        response: format!("Success")
+    })
+}
+
+pub async fn handle_state(Json(payload): Json<State>) -> Json<AjaxResult> {
+    pyo3::prepare_freethreaded_python();
+    
+    let state = payload.state.parse::<i32>().unwrap();
+    let code = include_str!("py/state.py");
+    let mut res = String::new();
+
+    Python::with_gil(|py| {
+        let args = PyTuple::new_bound(py, &[state]);
+        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("state").unwrap().into();
+        let py_res = py_fun.call1(py, args).unwrap();
+        res = format!("{py_res}");
+    });
+
+    Json(AjaxResult {
+        status: "ok".to_string(),
+        response: format!("{res}")
     })
 }

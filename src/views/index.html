@@ -13,8 +13,40 @@
     .success {
         color: green;
     }
+    #servos {
+        width: 50%;
+    }
+    #poses {
+        width: 50%;
+    }
+    .row {
+        display: flex;
+    }
+    .row > div, #states {
+        border: 1px solid;
+        padding: 10px;
+    }
 </style>
-<div id="servos"></div>
+<div class="row">
+    <div id="servos">
+        <h1>Настройка вручную</h1>
+    </div>
+    <div id="poses">
+        <h1>Готовые позиции</h1>
+        <select id="pose-select">
+            <option value="0">Стандартная</option>
+            <option value="1">Змейка</option>
+            <option value="2">Зиг-заг</option>
+            <option value="3">Наклон</option>
+        </select>
+        <button class="form-btn pose-btn">Применить</button>
+        <span class="result-text-pose"></span>
+    </div>
+</div>
+<div id="states">
+    <h1 class="text-center">Состояние</h1>
+    <button class="form-btn state-btn">Тест</button>
+</div>
 <script>
     var servoForms = {
         servoCount: 6,
@@ -39,10 +71,11 @@
 
             $(document).on('click', '.servo-btn', function() {
                 var name = $(this).attr('data-input');
+                var resultSpan = $('.result-text[data-servo=' + name + ']');
                 var input = $('input[name=' + name + ']');
                 var val = input.val();
 
-                self.clearResult(name);
+                self.clearResult(resultSpan);
                 
                 if (val && isFinite(val) && val >= self.servoMin && val <= self.servoMax) {
                     $.ajax({
@@ -52,20 +85,58 @@
                         contentType: 'application/json',
                         success: function(res) {
                             if (res.status == 'ok') {
-                                self.showResult(name, res.response, true);
+                                self.showResult(resultSpan, res.response, true);
                             }
                         },
                         error: function(res) {
-                            console.log(res.responseText);
+                            self.showResult(resultSpan, res.responseText, false);
                         }
                     });
                 } else {
-                    self.showResult(name, 'Неверное число. Число должно быть в дипаозоне [' + self.servoMin + '; ' + self.servoMax + ']', false);
+                    self.showResult(resultSpan, 'Неверное число. Число должно быть в дипаозоне [' + self.servoMin + '; ' + self.servoMax + ']', false);
                 }
             });
+
+            $(document).on('click', '.pose-btn', function() {
+                var val = $('#pose-select').val();
+                var resultSpan = $('.result-text-pose');
+
+                self.clearResult(resultSpan);
+
+                $.ajax({
+                        method: 'POST',
+                        url: '/pose',
+                        data: JSON.stringify({pose: val}),
+                        contentType: 'application/json',
+                        success: function(res) {
+                            if (res.status == 'ok') {
+                                self.showResult(resultSpan, res.response, true);
+                            }
+                        },
+                        error: function(res) {
+                            self.showResult(resultSpan, res.responseText, false);
+                        }
+                    });
+            });
+
+            $(document).on('click', '.state-btn', function() {
+                var val = '32';
+
+                $.ajax({
+                        method: 'POST',
+                        url: '/state',
+                        data: JSON.stringify({state: val}),
+                        contentType: 'application/json',
+                        success: function(res) {
+                            console.log(res);
+                        },
+                        error: function(res) {
+                            console.log(res);
+                        }
+                    });
+            });
         },
-        showResult: function(name, text, isSuccess) {
-            var resultSpan = $('.result-text[data-servo=' + name + ']');
+        showResult: function(resultSpan, text, isSuccess) {
             resultSpan.html(text);
 
             if (!isSuccess) {
@@ -74,8 +145,7 @@
                 resultSpan.addClass('success');
             }
         },
-        clearResult: function(name) {
-            var resultSpan = $('.result-text[data-servo=' + name + ']');
+        clearResult: function(resultSpan) {
             resultSpan.html('');
             resultSpan.removeClass('danger');
             resultSpan.removeClass('success');
