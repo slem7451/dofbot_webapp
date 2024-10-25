@@ -11,3 +11,4 @@ poses = {
 def control_pose(*args):
     pose = poses[args[0]]
     Arm.Arm_serial_servo_write6_array(pose, 1000)
+    return pose

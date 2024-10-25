@@ -61,9 +61,10 @@
 
                 var html = '<div class="' + name + ' servo">';
                 html += '<label class="form-label">' + label + '</label>';
-                html += '<input type="number" max="180" min="-180" class="form-input" name="' + name + '"/>';
+                html += '<input type="number" max="180" min="-180" class="form-input servo-input" name="' + name + '"/>';
                 html += '<button type="button" class="form-btn servo-btn" data-input="' + name + '">Отправить</button>';
-                html += '<span class="result-text" data-servo="' + name + '"></span>'
+                html += '<input type="range" max="180" min="-180" step="1" class="servo-range" name="' + name + '"/>';
+                html += '<span class="result-text" data-servo="' + name + '"></span>';
                 html += '</div>';
 
                 $('#servos').append(html);
@@ -72,7 +73,7 @@
             $(document).on('click', '.servo-btn', function() {
                 var name = $(this).attr('data-input');
                 var resultSpan = $('.result-text[data-servo=' + name + ']');
-                var input = $('input[name=' + name + ']');
+                var input = $('input.servo-input[name=' + name + ']');
                 var val = input.val();
 
                 self.clearResult(resultSpan);
@@ -110,7 +111,9 @@
                         contentType: 'application/json',
                         success: function(res) {
                             if (res.status == 'ok') {
-                                self.showResult(resultSpan, res.response, true);
+                                self.showResult(resultSpan, 'Success', true);
+                                var servos = JSON.parse(res.response);
+                                self.updateInputs(servos);
                             }
                         },
                         error: function(res) {
@@ -135,6 +138,19 @@
                         }
                     });
             });
+
+            $(document).on('input', '.servo-range', function() {
+                var val = $(this).val();
+                var name = $(this).attr('name');
+                $('input.servo-input[name=' + name + ']').val(val);
+                $('.servo-btn[data-input=' + name + ']').trigger('click');
+            });
+
+            $(document).on('input', '.servo-input', function() {
+                var val = $(this).val();
+                var name = $(this).attr('name');
+                $('input.servo-range[name=' + name + ']').val(val);
+            });
         },
         showResult: function(resultSpan, text, isSuccess) {
             resultSpan.html(text);
@@ -149,6 +165,14 @@
             resultSpan.html('');
             resultSpan.removeClass('danger');
             resultSpan.removeClass('success');
+        },
+        updateInputs: function(servos) {
+            for (var i = 0; i < servos.length; i++) {
+                var servoIdx = i + 1;
+                var val = servos[i];
+                $('input.servo-input[name=servo' + servoIdx + ']').val(val);
+                $('input.servo-range[name=servo' + servoIdx + ']').val(val);
+            }
         }
     }
     $(document).ready(function() {

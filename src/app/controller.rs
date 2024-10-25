@@ -74,16 +74,18 @@ pub async fn handle_pose(Json(payload): Json<Pose>) -> Json<AjaxResult> {
     
     let pose = payload.pose.parse::<i32>().unwrap();
     let code = include_str!("py/control_pose.py");
+    let mut res = String::new();
 
     Python::with_gil(|py| {
         let args = PyTuple::new_bound(py, &[pose]);
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control_pose").unwrap().into();
-        py_fun.call1(py, args).unwrap();
+        let py_res = py_fun.call1(py, args).unwrap();
+        res = format!("{py_res}");
     });
 
     Json(AjaxResult {
         status: "ok".to_string(),
-        response: format!("Success")
+        response: res
     })
 }
 
