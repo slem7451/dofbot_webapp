@@ -21,8 +21,8 @@ pub async fn serve() {
         .route("/servo", post(handle_servo))
         .route("/pose", post(handle_pose));
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();   //Запуск сервера локально
-    //let listener = tokio::net::TcpListener::bind("192.168.1.11:3000").await.unwrap(); //Запуск сервера на роботе
+    //let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();   //Запуск сервера локально
+    let listener = tokio::net::TcpListener::bind("192.168.1.11:3000").await.unwrap(); //Запуск сервера на роботе
     axum::serve(listener, app).await.unwrap();
 }
 

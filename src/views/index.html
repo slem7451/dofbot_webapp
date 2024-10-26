@@ -37,13 +37,23 @@
     </div>
     <div id="poses">
         <h1>Готовые позиции</h1>
-        <select id="pose-select">
-            <option value="0">Стандартная</option>
-            <option value="1">Змейка</option>
-            <option value="2">Зиг-заг</option>
-            <option value="3">Наклон</option>
-        </select>
-        <button class="form-btn pose-btn">Применить</button>
+        <button class="pose-btn secondary-btn" data-pose="0">
+            <h3 class="no-margin">Стандартная</h3>
+            <img src="/static/images/poses/standart.png">
+        </button>
+        <button class="pose-btn secondary-btn" data-pose="1">
+            <h3 class="no-margin">Змейка</h3>
+            <img src="/static/images/poses/snake.png">
+        </button>
+        <button class="pose-btn secondary-btn" data-pose="2">
+            <h3 class="no-margin">Зиг-заг</h3>
+            <img src="/static/images/poses/zigzag.png">
+        </button>
+        <button class="pose-btn secondary-btn" data-pose="3">
+            <h3 class="no-margin">Наклон</h3>
+            <img src="/static/images/poses/lay.png">
+        </button>
+        <br>
         <span class="result-text-pose"></span>
     </div>
 </div>
@@ -99,7 +109,7 @@
             });
 
             $(document).on('click', '.pose-btn', function() {
-                var val = $('#pose-select').val();
+                var val = $(this).attr('data-pose');
                 var servo6 = $('input.servo-input[name=servo6]').val();
                 var resultSpan = $('.result-text-pose');
 
