@@ -47,10 +47,6 @@
         <span class="result-text-pose"></span>
     </div>
 </div>
-<div id="states">
-    <h1 class="text-center">Состояние</h1>
-    <button class="form-btn state-btn">Тест</button>
-</div>
 <script>
     var servoForms = {
         servoCount: 6,
@@ -104,14 +100,19 @@
 
             $(document).on('click', '.pose-btn', function() {
                 var val = $('#pose-select').val();
+                var servo6 = $('input.servo-input[name=servo6]').val();
                 var resultSpan = $('.result-text-pose');
+
+                if (servo6 !== 0 && !servo6) {
+                    servo6 = '90';
+                }
 
                 self.clearResult(resultSpan);
 
                 $.ajax({
                         method: 'POST',
                         url: '/pose',
-                        data: JSON.stringify({pose: val}),
+                        data: JSON.stringify({pose: val, servo6: servo6}),
                         contentType: 'application/json',
                         success: function(res) {
                             if (res.status == 'ok') {

@@ -9,6 +9,7 @@ pub struct Servo {
 #[derive(Deserialize)]
 pub struct Pose {
     pub pose: String,
+    pub servo6: String,
 }
 
 #[derive(Deserialize)]
