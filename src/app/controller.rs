@@ -7,21 +7,32 @@ use std::io::Read;
 use pyo3::{prelude::*, types::{PyModule, PyTuple}};
 use structs::*;
 
+/// Рендер HTML страницы
+/// * `file_name` - Название HTML-файла (только название, без пути!)
+/// * `params` - Значения, которые необходимо вставить в HTML из Rust
+/// 
+/// Указание параметров:
+/// 
+/// `("title", some_title_name)` - после этого в соответсвующем HTML нужно указать плейсхолдер вида `{{title}}`
 fn render(file_name: &'static str, mut params: HashMap<&'static str, &'static str>) -> String {
-    let title = *params.get(&"title").unwrap_or(&file_name);
+    let title = *params.get(&"title").unwrap_or(&file_name); //Получаем название вкладки. Если ее нет в params, то названием будет являться название файла
     params.remove("title");
 
     let mut file = File::open(format!("src/views/{}.html", file_name)).unwrap();
     let mut content = String::new();
-    file.read_to_string(&mut content).unwrap();
+    file.read_to_string(&mut content).unwrap(); //Весь контент файла записываем в строку
 
     for (k, v) in &params {
-        content = content.replace(format!("{{{{{}}}}}", k).as_str(), v)
+        content = content.replace(format!("{{{{{}}}}}", k).as_str(), v) //Заменяем плейсхолдеры на значения
     }
 
     return render_layout(content, title);
 }
 
+
+/// Вставка контента HTML внутрь шаблонного HTML (например, для отображения header и footer без их дублирования в каждом файле)
+/// * `content` - Контент HTML страницы
+/// * `title` - Название вкладки
 fn render_layout<'a>(content: String, title: &'static str) -> String {
     let mut file = File::open("src/views/layout.html").unwrap();
     let mut layout_content = String::new();
@@ -33,6 +44,9 @@ fn render_layout<'a>(content: String, title: &'static str) -> String {
     layout_content
 }
 
+///Слушатель для `/index`
+/// 
+/// Метод `GET`
 pub async fn handle_index() -> Html<String> {
     let title = "Настройка позиции";
 
@@ -42,6 +56,9 @@ pub async fn handle_index() -> Html<String> {
     ])))
 }
 
+///Слушатель для `/contacts`
+/// 
+/// Метод `GET`
 pub async fn handle_contacts() -> Html<String> {
     let title = "Контакты";
 
@@ -50,6 +67,12 @@ pub async fn handle_contacts() -> Html<String> {
     ])))
 }
 
+///Слушатель для `/servo`
+/// 
+/// Метод `POST`
+/// 
+/// Метод предназначен для задания угла отдельного servo робота
+/// * `payload` - Запрос
 pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     pyo3::prepare_freethreaded_python();
     
@@ -58,7 +81,7 @@ pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     let code = include_str!("py/control.py");
 
     Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[servo, angle]);
+        let args = PyTuple::new_bound(py, &[servo, angle]); //Второй парметр - передача значений в Python-функцию
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control").unwrap().into();
         py_fun.call1(py, args).unwrap();
     });
@@ -69,6 +92,12 @@ pub async fn handle_servo(Json(payload): Json<Servo>) -> Json<AjaxResult> {
     })
 }
 
+///Слушатель для `/pose`
+/// 
+/// Метод `POST`
+/// 
+/// Метод предназначен для задания готовой позиции робота
+/// * `payload` - Запрос
 pub async fn handle_pose(Json(payload): Json<Pose>) -> Json<AjaxResult> {
     pyo3::prepare_freethreaded_python();
     
@@ -78,9 +107,9 @@ pub async fn handle_pose(Json(payload): Json<Pose>) -> Json<AjaxResult> {
     let mut res = String::new();
 
     Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[pose, servo6]);
+        let args = PyTuple::new_bound(py, &[pose, servo6]); //Второй парметр - передача значений в Python-функцию
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control_pose").unwrap().into();
-        let py_res = py_fun.call1(py, args).unwrap();
+        let py_res = py_fun.call1(py, args).unwrap(); //Получаем результат, вернувшийся из Python-функции
         res = format!("{py_res}");
     });
 

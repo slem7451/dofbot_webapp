@@ -10,12 +10,13 @@ use axum::{
 use controller::*;
 use tokio::fs;
 
+///Запуск сервера
 #[tokio::main]
 pub async fn serve() {
     env_logger::init();
     
     let app = Router::new()
-        .route("/static/*path", get(serve_static_file))
+        .route("/static/*path", get(serve_static_file)) //Подгрузка статических файлов
         .route("/", get(handle_index))
         .route("/contacts", get(handle_contacts))
         .route("/servo", post(handle_servo))
@@ -26,6 +27,9 @@ pub async fn serve() {
     axum::serve(listener, app).await.unwrap();
 }
 
+
+/// Без данной функции, сервер не увидит статические файлы
+/// * `path` - GET-параметр пути обращения к файлу
 async fn serve_static_file(Path(path): Path<String>) -> impl IntoResponse {
     let file_path = format!("src/static/{}", path);
     
