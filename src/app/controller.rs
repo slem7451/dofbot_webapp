@@ -135,13 +135,13 @@ pub async fn handle_trajectory(mut multipart: Multipart) -> Json<AjaxResult> {
     let data_file = file.bytes().await.unwrap();
 
     let servo6 = multipart.next_field().await.unwrap().unwrap();
-    let data_sevor6 = servo6.text().await.unwrap();
+    let data_sevor6 = servo6.bytes().await.unwrap();
 
     let code = include_str!("py/trajectory.py");
     let mut res = String::new();
 
     Python::with_gil(|py| {
-        let args = PyTuple::new_bound(py, &[format!("{:?}", data_file), data_sevor6]); //Второй парметр - передача значений в Python-функцию
+        let args = PyTuple::new_bound(py, &[String::from_utf8(data_file.to_vec()).unwrap(), String::from_utf8(data_sevor6.to_vec()).unwrap()]); //Второй парметр - передача значений в Python-функцию
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("trajectory").unwrap().into();
         let py_res = py_fun.call1(py, args).unwrap(); //Получаем результат, вернувшийся из Python-функции
         res = format!("{py_res}");

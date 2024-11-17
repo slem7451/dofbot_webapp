@@ -7,7 +7,7 @@ def trajectory(*args):
     data = args[0]
     servo6 = args[1]
 
-    data = json.loads(data[2:-1].encode().decode('unicode_escape'))['arrays']
+    data = json.loads(data)['arrays']
 
     for item in data:
         pose = [None] * 6
