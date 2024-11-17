@@ -19,6 +19,9 @@
     #poses {
         width: 50%;
     }
+    #trajectory {
+        width: 50%;
+    }
     .row {
         display: flex;
     }
@@ -55,6 +58,13 @@
         </button>
         <br>
         <span class="result-text-pose"></span>
+    </div>
+</div>
+<div class="row">
+    <div id="trajectory">
+        <input type="file" id="trajectory-file">
+        <button type="button" class="form-btn trajectory-btn">Отправить</button>
+        <span class="result-text-trajectory"></span>
     </div>
 </div>
 <script>
@@ -137,21 +147,43 @@
                     });
             });
 
-            $(document).on('click', '.state-btn', function() {
-                var val = '32';
+            $(document).on('click', '.trajectory-btn', function(){
+                var servo6 = $('input.servo-input[name=servo6]').val();
 
+                if (servo6 !== 0 && !servo6) {
+                    servo6 = '90';
+                }
+
+                var resultSpan = $('.result-text-trajectory');
+                var fileInput = $('#trajectory-file');
+
+                if (!fileInput.prop('files')[0]) {
+                    self.showResult(resultSpan, 'Upload file to apply!', false);
+                    return;
+                }
+
+                var form = new FormData;
+
+                form.append('trajectory', fileInput.prop('files')[0]);
+                form.append('servo6', servo6);
+                
                 $.ajax({
-                        method: 'POST',
-                        url: '/state',
-                        data: JSON.stringify({state: val}),
-                        contentType: 'application/json',
-                        success: function(res) {
-                            console.log(res);
-                        },
-                        error: function(res) {
-                            console.log(res);
+                    url: '/trajectory',
+                    data: form,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    success: function (res) {
+                        if (res.status == 'ok') {
+                            self.showResult(resultSpan, 'Success', true);
+                            var servos = JSON.parse(res.response);
+                            self.updateInputs(servos);
                         }
-                    });
+                    },
+                    error: function(res) {
+                        self.showResult(resultSpan, res.responseText, false);
+                    }
+                });
             });
 
             $(document).on('input', '.servo-range', function() {

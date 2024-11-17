@@ -1,7 +1,10 @@
 mod structs;
 
 use std::collections::HashMap;
-use axum::{response::Html, Json};
+use axum::{
+    extract::Multipart, 
+    response::Html, 
+    Json};
 use std::fs::File;
 use std::io::Read;
 use pyo3::{prelude::*, types::{PyModule, PyTuple}};
@@ -109,6 +112,37 @@ pub async fn handle_pose(Json(payload): Json<Pose>) -> Json<AjaxResult> {
     Python::with_gil(|py| {
         let args = PyTuple::new_bound(py, &[pose, servo6]); //Второй парметр - передача значений в Python-функцию
         let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("control_pose").unwrap().into();
+        let py_res = py_fun.call1(py, args).unwrap(); //Получаем результат, вернувшийся из Python-функции
+        res = format!("{py_res}");
+    });
+
+    Json(AjaxResult {
+        status: "ok".to_string(),
+        response: res
+    })
+}
+
+///Слушатель для `/trajectory`
+/// 
+/// Метод `POST`
+/// 
+/// Метод предназначен для прохождения троектории из заданного файла
+/// * `multipart` - Отправленная форма запроса
+pub async fn handle_trajectory(mut multipart: Multipart) -> Json<AjaxResult> {
+    pyo3::prepare_freethreaded_python();
+
+    let file = multipart.next_field().await.unwrap().unwrap();
+    let data_file = file.bytes().await.unwrap();
+
+    let servo6 = multipart.next_field().await.unwrap().unwrap();
+    let data_sevor6 = servo6.text().await.unwrap();
+
+    let code = include_str!("py/trajectory.py");
+    let mut res = String::new();
+
+    Python::with_gil(|py| {
+        let args = PyTuple::new_bound(py, &[format!("{:?}", data_file), data_sevor6]); //Второй парметр - передача значений в Python-функцию
+        let py_fun: Py<PyAny> = PyModule::from_code_bound(py, code, "", "").unwrap().getattr("trajectory").unwrap().into();
         let py_res = py_fun.call1(py, args).unwrap(); //Получаем результат, вернувшийся из Python-функции
         res = format!("{py_res}");
     });

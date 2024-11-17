@@ -20,7 +20,8 @@ pub async fn serve() {
         .route("/", get(handle_index))
         .route("/contacts", get(handle_contacts))
         .route("/servo", post(handle_servo))
-        .route("/pose", post(handle_pose));
+        .route("/pose", post(handle_pose))
+        .route("/trajectory", post(handle_trajectory));
 
     //let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();   //Запуск сервера локально
     let listener = tokio::net::TcpListener::bind("192.168.1.11:3000").await.unwrap(); //Запуск сервера на роботе
