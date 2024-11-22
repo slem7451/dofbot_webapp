@@ -1,4 +1,5 @@
 from Arm_Lib import Arm_Device
+import time
 import json
 
 Arm = Arm_Device()
@@ -19,7 +20,8 @@ def trajectory(*args):
         if item[5] <= 180 and item[5] >= -180:
             servo6 = item[5]
         pose[5] = int(servo6)
-        time = item[6]
-        Arm.Arm_serial_servo_write6_array(pose, time)
+        timeS = item[6]
+        Arm.Arm_serial_servo_write6_array(pose, timeS)
+        time.sleep(timeS / 1000)
 
     return pose
