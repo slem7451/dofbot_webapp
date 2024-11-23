@@ -126,7 +126,7 @@ pub async fn handle_pose(Json(payload): Json<Pose>) -> Json<AjaxResult> {
 /// 
 /// Метод `POST`
 /// 
-/// Метод предназначен для прохождения троектории из заданного файла
+/// Метод предназначен для прохождения траектории из заданного файла
 /// * `multipart` - Отправленная форма запроса
 pub async fn handle_trajectory(mut multipart: Multipart) -> Json<AjaxResult> {
     pyo3::prepare_freethreaded_python();
